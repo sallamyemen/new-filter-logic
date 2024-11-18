@@ -5,16 +5,16 @@
       <div class="items">
         <ul>
           <li v-for="item in category.items" :key="item.key">
-            <input type="checkbox" :id="item.key" :value="item.key" v-model="selectedItems" @change="onCheckboxChange" />
+            <input type="checkbox" :id="item.key" :value="item.key" v-model="selectedItems" @change="onCheckboxChange(item.key)" />
             <label :for="item.key">{{ item.key }}</label>
           </li>
         </ul>
       </div>
       <div class="subcategories" v-if="category.subCategories">
         <div v-for="subCategory in category.subCategories" :key="subCategory.key">
-          <ul>
+          <ul class="ml-4">
             <li v-for="subItem in subCategory.items" :key="subItem.key">
-              <input type="checkbox" :id="subItem.key" :value="subItem.key" v-model="selectedItems" @change="onCheckboxChange" />
+              <input type="checkbox" :id="subItem.key" :value="subItem.key" v-model="selectedItems" @change="onCheckboxChange(subItem.key)" />
               <label :for="subItem.key">{{ subItem.key }}</label>
             </li>
           </ul>
@@ -40,7 +40,14 @@ export default defineNuxtComponent({
   },
 
   methods: {
-    onCheckboxChange() {
+    onCheckboxChange(itemKey) {
+      // const { categoryKey, parentKey, parentItem } = this.findCategoryKey(itemKey, this.categoriesFilters);
+
+      // if (parentItem) {
+      //   // Toggle the parent checkbox when a subcategory item is checked/unchecked
+      //   this.toggleParentsStatus(parentItem);
+      // }
+
       const { pathSegments, queryParams } = this.createFilterParams();
       const { segments, parameters } = this.processFilterParams(pathSegments, queryParams);
       // console.log('parameters', parameters);
@@ -53,7 +60,7 @@ export default defineNuxtComponent({
       const queryParams = {};
 
       this.selectedItems.forEach(item => {
-        const { categoryKey, parentKey } = this.findCategoryKey(item, this.categoriesFilters);
+        const { categoryKey, parentKey, parentItem } = this.findCategoryKey(item, this.categoriesFilters);
 
         // if (categoryKey) {
         //   console.log(`category Key for ${item}:`, categoryKey);
@@ -61,6 +68,11 @@ export default defineNuxtComponent({
         //     console.log(`Parent Key for ${item}:`, parentKey);
         //   }
         // }
+
+        if(parentItem){
+          console.log(`Parent Item Key for ${item}:`, parentItem);
+          this.toggleParentsStatus(parentItem);
+        }
 
         if (!categoryKey.includes("category") && !categoryKey.includes("collection")) {
           queryParams[categoryKey] = queryParams[categoryKey] || [];
@@ -77,10 +89,10 @@ export default defineNuxtComponent({
       return { pathSegments, queryParams };
     },
 
-    findCategoryKey(itemKey, categories, parentKey = null) {
+    findCategoryKey(itemKey, categories, parentKey = null, parentItem = null) {
       for (const category of categories) {
         if (category.items && category.items.some(item => item.key === itemKey)) {
-          return { categoryKey: category.key, parentKey };
+          return { categoryKey: category.key, parentKey, parentItem };
         }
         else if (category.subCategories) {
           const matchingSubCategories = category.subCategories.filter(subCategory =>
@@ -88,7 +100,7 @@ export default defineNuxtComponent({
           );
           if (matchingSubCategories.length > 0) {
             const subCategory = matchingSubCategories[0];
-            return { categoryKey: subCategory.key, parentKey: category.key };
+            return { categoryKey: subCategory.key, parentKey: category.key, parentItem: category.items[0].key };
           }
         }
       }
@@ -121,6 +133,24 @@ export default defineNuxtComponent({
       return {segments, parameters} ;
     },
 
+    toggleParentsStatus(parentItem) {
+
+      if (parentItem.isChecked) {
+
+        if (!this.selectedItems.includes(parentItem.key)) {
+          this.selectedItems.push(parentItem.key);
+          console.log('Add parent to selectedItems', this.selectedItems);
+        }
+      } else {
+
+        const index = this.selectedItems.indexOf(parentItem.key);
+        if (index > -1) {
+          this.selectedItems.splice(index, 1);
+          console.log('Remove parent from selectedItems', this.selectedItems);
+        }
+      }
+    },
+
     updateRoute(segments, parameters) {
 
       const pathSegments = [];
@@ -133,10 +163,10 @@ export default defineNuxtComponent({
       }
       const path = pathSegments.length > 0 ? `/${pathSegments.join('/')}` : '/catalog';
 
-      console.log('path', path);
-      console.log('parameters', parameters);
+      // console.log('path', path);
+      // console.log('parameters', parameters);
 
-      //this.$router.push({ path, query: parameters });
+      // this.$router.push({ path, query: parameters });
     }
 
   }
@@ -147,5 +177,8 @@ export default defineNuxtComponent({
 <style scoped>
 ul{
   list-style: none;
+}
+.subcategories {
+  margin-left: 1rem;
 }
 </style>
