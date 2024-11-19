@@ -1,11 +1,11 @@
 <template>
   <div>
     <h1>Product Filters</h1>
-    <div v-for="category in categoriesFilters" :key="category.key" class="category">
+    <div v-for="(category, categoryIndex) in categoriesFilters" :key="category.key" class="category">
       <div class="items">
         <ul>
-          <li v-for="item in category.items" :key="item.key">
-            <input type="checkbox" :id="item.key" :value="item.key" v-model="selectedItems" @change="onCheckboxChange(item.key)" />
+          <li v-for="item in category.items" v-if="categoryIndex < 3" :key="item.key">
+            <input type="checkbox" :id="item.key" :value="item.key" v-model="selectedItems" @change="onCheckboxChange(item.key, categoryIndex, 'parent')" />
             <label :for="item.key">{{ item.key }}</label>
           </li>
         </ul>
@@ -14,7 +14,7 @@
         <div v-for="subCategory in category.subCategories" :key="subCategory.key">
           <ul class="ml-4">
             <li v-for="subItem in subCategory.items" :key="subItem.key">
-              <input type="checkbox" :id="subItem.key" :value="subItem.key" v-model="selectedItems" @change="onCheckboxChange(subItem.key)" />
+              <input type="checkbox" :id="subItem.key" :value="subItem.key" v-model="selectedItems" @change="onCheckboxChange(subItem.key, categoryIndex, 'subcategory')" />
               <label :for="subItem.key">{{ subItem.key }}</label>
             </li>
           </ul>
@@ -40,20 +40,97 @@ export default defineNuxtComponent({
   },
 
   methods: {
-    onCheckboxChange(itemKey) {
-      // const { categoryKey, parentKey, parentItem } = this.findCategoryKey(itemKey, this.categoriesFilters);
-
-      // if (parentItem) {
-      //   // Toggle the parent checkbox when a subcategory item is checked/unchecked
-      //   this.toggleParentsStatus(parentItem);
-      // }
+    onCheckboxChange(itemKey, categoryIndex, type) {
+      if (type === "parent") {
+        this.updateParentCategory(categoryIndex);
+      } else if (type === "subcategory") {
+        this.updateParentOnSubcategoryChange(categoryIndex);
+      }
 
       const { pathSegments, queryParams } = this.createFilterParams();
       const { segments, parameters } = this.processFilterParams(pathSegments, queryParams);
-      // console.log('parameters', parameters);
-      // console.log('segments', segments);
+
       this.updateRoute(segments, parameters);
     },
+
+    updateParentCategory(categoryIndex) {
+      const category = this.categoriesFilters[categoryIndex];
+       const isParentChecked = this.selectedItems.includes(category.items[0].key);
+
+      if (isParentChecked) {
+        this.selectAllSubcategories(category);
+      } else {
+        this.deselectAllSubcategories(category);
+      }
+
+      this.selectedItems = [...new Set(this.selectedItems)];
+    },
+
+    selectAllSubcategories(category) {
+
+      if (category.items) {
+        category.items.forEach((item) => {
+          if (!this.selectedItems.includes(item.key)) {
+            this.selectedItems.push(item.key);
+          }
+        });
+      }
+
+      if (category.subCategories) {
+        category.subCategories.forEach((subCategory) => {
+          subCategory.items.forEach((subItem) => {
+            if (!this.selectedItems.includes(subItem.key)) {
+              this.selectedItems.push(subItem.key);
+            }
+          });
+        });
+      }
+    },
+
+    deselectAllSubcategories(category) {
+
+      if (category.items) {
+        category.items.forEach((item) => {
+          this.selectedItems = this.selectedItems.filter(
+              (selected) => selected !== item.key
+          );
+        });
+      }
+
+      if (category.subCategories) {
+        category.subCategories.forEach((subCategory) => {
+          subCategory.items.forEach((subItem) => {
+            this.selectedItems = this.selectedItems.filter(
+                (selected) => selected !== subItem.key
+            );
+          });
+        });
+      }
+    },
+
+    updateParentOnSubcategoryChange(categoryIndex) {
+      const category = this.categoriesFilters[categoryIndex];
+
+      let isAnySubcategoryChecked = false;
+      if (category.subCategories) {
+        isAnySubcategoryChecked = category.subCategories.some((subCategory) =>
+            subCategory.items.some((subItem) =>
+                this.selectedItems.includes(subItem.key)
+            )
+        );
+      }
+
+      if (isAnySubcategoryChecked) {
+        if (!this.selectedItems.includes(category.items[0].key)) {
+          this.selectedItems.push(category.items[0].key);
+        }
+      } else {
+        this.selectedItems = this.selectedItems.filter(
+            (selected) => selected !== category.items[0].key
+        );
+      }
+    },
+
 
     createFilterParams() {
       const pathSegments = {};
@@ -61,27 +138,19 @@ export default defineNuxtComponent({
 
       this.selectedItems.forEach(item => {
         const { categoryKey, parentKey, parentItem } = this.findCategoryKey(item, this.categoriesFilters);
-
         // if (categoryKey) {
         //   console.log(`category Key for ${item}:`, categoryKey);
         //   if (parentKey) {
         //     console.log(`Parent Key for ${item}:`, parentKey);
         //   }
         // }
-
-        if(parentItem){
-          console.log(`Parent Item Key for ${item}:`, parentItem);
-          this.toggleParentsStatus(parentItem);
-        }
-
         if (!categoryKey.includes("category") && !categoryKey.includes("collection")) {
           queryParams[categoryKey] = queryParams[categoryKey] || [];
           queryParams[categoryKey].push(item);
-        } else{
+        } else {
           pathSegments[categoryKey] = pathSegments[categoryKey] || [];
           pathSegments[categoryKey].push(item);
         }
-
         // console.log('queryParams', queryParams);
         // console.log('pathSegments', pathSegments);
       });
@@ -92,7 +161,7 @@ export default defineNuxtComponent({
     findCategoryKey(itemKey, categories, parentKey = null, parentItem = null) {
       for (const category of categories) {
         if (category.items && category.items.some(item => item.key === itemKey)) {
-          return { categoryKey: category.key, parentKey, parentItem };
+          return { categoryKey: category.key, parentKey };
         }
         else if (category.subCategories) {
           const matchingSubCategories = category.subCategories.filter(subCategory =>
@@ -100,7 +169,7 @@ export default defineNuxtComponent({
           );
           if (matchingSubCategories.length > 0) {
             const subCategory = matchingSubCategories[0];
-            return { categoryKey: subCategory.key, parentKey: category.key, parentItem: category.items[0].key };
+            return { categoryKey: subCategory.key, parentKey: category.key};
           }
         }
       }
@@ -122,33 +191,14 @@ export default defineNuxtComponent({
 
       for (const [key, value] of Object.entries(queryParams)) {
         if (key === "collection") {
-          if (value.length >= 0) {
+          if (value.length > 0) {
             segments[key] = value[0];
           }
-        } else {
-
+        } else if(key) {
           parameters[key] = value.join(',');
         }
       }
       return {segments, parameters} ;
-    },
-
-    toggleParentsStatus(parentItem) {
-
-      if (parentItem.isChecked) {
-
-        if (!this.selectedItems.includes(parentItem.key)) {
-          this.selectedItems.push(parentItem.key);
-          console.log('Add parent to selectedItems', this.selectedItems);
-        }
-      } else {
-
-        const index = this.selectedItems.indexOf(parentItem.key);
-        if (index > -1) {
-          this.selectedItems.splice(index, 1);
-          console.log('Remove parent from selectedItems', this.selectedItems);
-        }
-      }
     },
 
     updateRoute(segments, parameters) {
@@ -163,14 +213,12 @@ export default defineNuxtComponent({
       }
       const path = pathSegments.length > 0 ? `/${pathSegments.join('/')}` : '/catalog';
 
-      // console.log('path', path);
-      // console.log('parameters', parameters);
+      console.log('path', path);
+      console.log('parameters', parameters);
 
-      // this.$router.push({ path, query: parameters });
-    }
-
-  }
-
+      this.$router.push({ path, query: parameters });
+    },
+  },
 });
 </script>
 
