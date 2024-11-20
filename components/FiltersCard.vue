@@ -55,7 +55,7 @@ export default defineNuxtComponent({
 
     updateParentCategory(categoryIndex) {
       const category = this.categoriesFilters[categoryIndex];
-       const isParentChecked = this.selectedItems.includes(category.items[0].key);
+      const isParentChecked = this.selectedItems.includes(category.items[0].key);
 
       if (isParentChecked) {
         this.selectAllSubcategories(category);
@@ -137,7 +137,7 @@ export default defineNuxtComponent({
       const queryParams = {};
 
       this.selectedItems.forEach(item => {
-        const { categoryKey, parentKey, parentItem } = this.findCategoryKey(item, this.categoriesFilters);
+        const { categoryKey, parentKey } = this.findCategoryKey(item, this.categoriesFilters);
         // if (categoryKey) {
         //   console.log(`category Key for ${item}:`, categoryKey);
         //   if (parentKey) {
@@ -158,7 +158,7 @@ export default defineNuxtComponent({
       return { pathSegments, queryParams };
     },
 
-    findCategoryKey(itemKey, categories, parentKey = null, parentItem = null) {
+    findCategoryKey(itemKey, categories, parentKey = null) {
       for (const category of categories) {
         if (category.items && category.items.some(item => item.key === itemKey)) {
           return { categoryKey: category.key, parentKey };
