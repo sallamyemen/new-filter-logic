@@ -1,10 +1,20 @@
 <template>
   <div class="products">
     <h1>Товары</h1>
-    <div class="product-list">
-      <div v-for="product in products" :key="product.name" class="product">
-        <h2>{{ product.name }}</h2>
-        <img :src="product.image" :alt="product.name" />
+    <div class="productList">
+      <div
+          v-for="productlist in filteredProducts"
+          :key="productlist.name"
+          class="productsList"
+      >
+        <div
+            v-for="product in productlist"
+            :key="product.name"
+            class="singleProduct"
+        >
+          <h2>{{ product.name }}</h2>
+          <img :src="product.images[0].path" :alt="product.name" />
+        </div>
       </div>
     </div>
   </div>
@@ -18,6 +28,17 @@ export default defineNuxtComponent({
       default: "",
     },
   },
+  data() {
+    return {
+      products: []
+    };
+  },
+  computed: {
+
+    filteredProducts() {
+      return this.products.slice(4, 9).map(product => product.goods_list);
+    },
+  },
   mounted() {
     this.$productsStore.fetchProducts()
         .then(products => {
@@ -27,21 +48,6 @@ export default defineNuxtComponent({
           console.error('Ошибка при загрузке продуктов:', error);
         });
   },
-  data() {
-    return {
-      products: []
-    };
-  },
-  // created() {
-  //   this.fetchProducts();
-  // },
-  // methods: {
-  //   async fetchProducts() {
-  //     const productsStore = useProductsStore();
-  //     await productsStore.fetchProducts();
-  //     this.products = productsStore.products;
-  //   }
-  // }
 });
 </script>
 
@@ -49,7 +55,7 @@ export default defineNuxtComponent({
 .products{
   width: 40%;
 }
-.product-list {
+.productList {
   display: flex;
   flex-wrap: wrap;
 }

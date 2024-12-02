@@ -5,7 +5,7 @@
       <div class="items">
         <ul>
           <li v-for="item in category.items" v-if="categoryIndex < 3" :key="item.key">
-            <input type="checkbox" :id="item.key" :value="item.key" v-model="selectedItems" @change="onCheckboxChange(item.key, categoryIndex, 'parent')" />
+            <input type="checkbox" :id="item.key" :value="item.key" v-model="selectedItems" @change="handleCheckboxChange(item.key, categoryIndex, 'parent')" />
             <label :for="item.key">{{ item.key }}</label>
           </li>
         </ul>
@@ -14,7 +14,7 @@
         <div v-for="subCategory in category.subCategories" :key="subCategory.key">
           <ul class="ml-4">
             <li v-for="subItem in subCategory.items" :key="subItem.key">
-              <input type="checkbox" :id="subItem.key" :value="subItem.key" v-model="selectedItems" @change="onCheckboxChange(subItem.key, categoryIndex, 'subcategory')" />
+              <input type="checkbox" :id="subItem.key" :value="subItem.key" v-model="selectedItems" @change="handleCheckboxChange(subItem.key, categoryIndex, 'subcategory')" />
               <label :for="subItem.key">{{ subItem.key }}</label>
             </li>
           </ul>
@@ -40,7 +40,7 @@ export default defineNuxtComponent({
   },
 
   methods: {
-    onCheckboxChange(itemKey, categoryIndex, type) {
+    handleCheckboxChange(itemKey, categoryIndex, type) {
       if (type === "parent") {
         this.updateParentCategory(categoryIndex);
       } else if (type === "subcategory") {
@@ -211,12 +211,12 @@ export default defineNuxtComponent({
       if (segments.collection) {
         pathSegments.push(`collection-${segments.collection}`);
       }
-      const path = pathSegments.length > 0 ? `/${pathSegments.join('/')}` : '/catalog';
+      const path = pathSegments.length > 0 ? `/catalog/${pathSegments.join('/')}/` : '/catalog/';
 
       console.log('path', path);
       console.log('parameters', parameters);
 
-      this.$router.push({ path, query: parameters });
+      // this.$router.push({ path, query: parameters });
     },
   },
 });
