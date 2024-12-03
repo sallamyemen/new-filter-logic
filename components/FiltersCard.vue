@@ -5,7 +5,7 @@
       <div class="items">
         <ul>
           <li v-for="item in category.items" v-if="categoryIndex < 3" :key="item.key">
-            <input type="checkbox" :id="item.key" :value="item.key" v-model="selectedItems" @change="handleCheckboxChange(item.key, categoryIndex, 'parent')" />
+            <input type="checkbox" :id="item.key" :value="item.key" :checked="item.isChecked" v-model="selectedItems" @change="handleCheckboxChange(item.key, categoryIndex, 'parent')" />
             <label :for="item.key">{{ item.key }}</label>
           </li>
         </ul>
@@ -14,7 +14,7 @@
         <div v-for="subCategory in category.subCategories" :key="subCategory.key">
           <ul class="ml-4">
             <li v-for="subItem in subCategory.items" :key="subItem.key">
-              <input type="checkbox" :id="subItem.key" :value="subItem.key" v-model="selectedItems" @change="handleCheckboxChange(subItem.key, categoryIndex, 'subcategory')" />
+              <input type="checkbox" :id="subItem.key" :value="subItem.key" :checked="subCategory.isChecked" v-model="selectedItems" @change="handleCheckboxChange(subItem.key, categoryIndex, 'subcategory')" />
               <label :for="subItem.key">{{ subItem.key }}</label>
             </li>
           </ul>
@@ -41,16 +41,48 @@ export default defineNuxtComponent({
 
   methods: {
     handleCheckboxChange(itemKey, categoryIndex, type) {
+
       if (type === "parent") {
         this.updateParentCategory(categoryIndex);
       } else if (type === "subcategory") {
         this.updateParentOnSubcategoryChange(categoryIndex);
       }
 
+      this.categoriesFilters.forEach((category) => {
+        category.items.forEach((item) => {
+          if (item.key === itemKey)
+            item.isChecked = false;
+        });
+      });
+      this.updateIsCheckedStatus(itemKey);
+      //item.isChecked = true
+
+      // console.log('itemKey', itemKey);
+      console.log('categoriesFilters', this.categoriesFilters);
+
       const { pathSegments, queryParams } = this.createFilterParams();
       const { segments, parameters } = this.processFilterParams(pathSegments, queryParams);
 
       this.updateRoute(segments, parameters);
+    },
+
+    updateIsCheckedStatus(itemKey) {
+
+      this.categoriesFilters.forEach((category) => {
+        category.items.forEach((item) => {
+          if (item.key === itemKey)
+              item.isChecked = true;
+        });
+
+        if (category.subCategories) {
+          category.subCategories.forEach((subCategory) => {
+            subCategory.items.forEach((subItem) => {
+              if (subItem.key === itemKey)
+                  subItem.isChecked =  true;
+            });
+          });
+        }
+      });
     },
 
     updateParentCategory(categoryIndex) {
@@ -72,6 +104,7 @@ export default defineNuxtComponent({
         category.items.forEach((item) => {
           if (!this.selectedItems.includes(item.key)) {
             this.selectedItems.push(item.key);
+            item.isChecked = true;
           }
         });
       }
@@ -81,6 +114,7 @@ export default defineNuxtComponent({
           subCategory.items.forEach((subItem) => {
             if (!this.selectedItems.includes(subItem.key)) {
               this.selectedItems.push(subItem.key);
+              subItem.isChecked = true;
             }
           });
         });
@@ -94,6 +128,7 @@ export default defineNuxtComponent({
           this.selectedItems = this.selectedItems.filter(
               (selected) => selected !== item.key
           );
+          item.isChecked = false;
         });
       }
 
@@ -103,6 +138,7 @@ export default defineNuxtComponent({
             this.selectedItems = this.selectedItems.filter(
                 (selected) => selected !== subItem.key
             );
+            subItem.isChecked = false;
           });
         });
       }
@@ -123,11 +159,13 @@ export default defineNuxtComponent({
       if (isAnySubcategoryChecked) {
         if (!this.selectedItems.includes(category.items[0].key)) {
           this.selectedItems.push(category.items[0].key);
+          category.items[0].isChecked = true;
         }
       } else {
         this.selectedItems = this.selectedItems.filter(
-            (selected) => selected !== category.items[0].key
+          (selected) => selected !== category.items[0].key
         );
+          category.items[0].isChecked = false;
       }
     },
 
