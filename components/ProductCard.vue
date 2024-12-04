@@ -34,7 +34,6 @@ export default defineNuxtComponent({
     };
   },
   computed: {
-
     filteredProducts() {
       return this.products.slice(4, 9).map(product => product.goods_list);
     },

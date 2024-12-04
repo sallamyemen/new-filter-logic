@@ -32,6 +32,18 @@
 
 <script>
 export default defineNuxtComponent({
+
+  asyncData(nuxtApp) {
+    try{
+      const route = useRoute();
+      const queryParams = route.query;
+      const pathSegments = route.params.params || [];
+      return { queryParams, pathSegments };
+    } catch (error){
+      console.error('Ошибка в url:', error);
+    }
+  },
+
   data() {
     return {
       selectedItems: [],
@@ -48,17 +60,8 @@ export default defineNuxtComponent({
         this.updateParentOnSubcategoryChange(categoryIndex);
       }
 
-      this.categoriesFilters.forEach((category) => {
-        category.items.forEach((item) => {
-          if (item.key === itemKey)
-            item.isChecked = false;
-        });
-      });
-      this.updateIsCheckedStatus(itemKey);
-      //item.isChecked = true
-
-      // console.log('itemKey', itemKey);
-      console.log('categoriesFilters', this.categoriesFilters);
+      //this.updateSelectedItems();
+      // console.log('categoriesFilters', this.categoriesFilters);
 
       const { pathSegments, queryParams } = this.createFilterParams();
       const { segments, parameters } = this.processFilterParams(pathSegments, queryParams);
@@ -66,24 +69,22 @@ export default defineNuxtComponent({
       this.updateRoute(segments, parameters);
     },
 
-    updateIsCheckedStatus(itemKey) {
+    // updateSelectedItems() {
+    //   this.selectedItems = [];
+    //   this.categoriesFilters.forEach((category) => {
+    //     category.items.forEach((item) => {
+    //       if (item.isChecked) this.selectedItems.push(item.key);
+    //     });
+    //     if (category.subCategories) {
+    //       category.subCategories.forEach((subCategory) => {
+    //         subCategory.items.forEach((subItem) => {
+    //           if (subItem.isChecked) this.selectedItems.push(subItem.key);
+    //         });
+    //       });
+    //     }
+    //   });
+    // },
 
-      this.categoriesFilters.forEach((category) => {
-        category.items.forEach((item) => {
-          if (item.key === itemKey)
-              item.isChecked = true;
-        });
-
-        if (category.subCategories) {
-          category.subCategories.forEach((subCategory) => {
-            subCategory.items.forEach((subItem) => {
-              if (subItem.key === itemKey)
-                  subItem.isChecked =  true;
-            });
-          });
-        }
-      });
-    },
 
     updateParentCategory(categoryIndex) {
       const category = this.categoriesFilters[categoryIndex];
@@ -169,19 +170,13 @@ export default defineNuxtComponent({
       }
     },
 
-
     createFilterParams() {
       const pathSegments = {};
       const queryParams = {};
 
       this.selectedItems.forEach(item => {
         const { categoryKey, parentKey } = this.findCategoryKey(item, this.categoriesFilters);
-        // if (categoryKey) {
-        //   console.log(`category Key for ${item}:`, categoryKey);
-        //   if (parentKey) {
-        //     console.log(`Parent Key for ${item}:`, parentKey);
-        //   }
-        // }
+
         if (!categoryKey.includes("category") && !categoryKey.includes("collection")) {
           queryParams[categoryKey] = queryParams[categoryKey] || [];
           queryParams[categoryKey].push(item);
@@ -189,8 +184,7 @@ export default defineNuxtComponent({
           pathSegments[categoryKey] = pathSegments[categoryKey] || [];
           pathSegments[categoryKey].push(item);
         }
-        // console.log('queryParams', queryParams);
-        // console.log('pathSegments', pathSegments);
+
       });
 
       return { pathSegments, queryParams };
@@ -251,12 +245,34 @@ export default defineNuxtComponent({
       }
       const path = pathSegments.length > 0 ? `/catalog/${pathSegments.join('/')}/` : '/catalog/';
 
-      console.log('path', path);
-      console.log('parameters', parameters);
+      // console.log('path', path);
+      // console.log('parameters', parameters);
 
-      // this.$router.push({ path, query: parameters });
+      this.$router.push({ path, query: parameters });
     },
   },
+
+  watch: {
+    categoriesFilters: {
+      deep: true,
+      handler(categoriesFilters) {
+        this.$filtersStore.categoriesFilters = categoriesFilters;
+        // console.log('categoriesFilters', categoriesFilters);
+        // console.log('this.$filtersStore.categoriesFilters', this.$filtersStore.categoriesFilters);
+      },
+    },
+  },
+
+  created() {
+    console.log('queryParams' , this.queryParams);
+    console.log('pathSegments' , this.pathSegments);
+    Object.values(this.queryParams).forEach(value => {
+      this.selectedItems.push(...value.split(','));
+    });
+    //this.updateSelectedItems();
+  },
+
+
 });
 </script>
 
