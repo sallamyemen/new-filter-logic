@@ -37,8 +37,12 @@ export default defineNuxtComponent({
     try{
       const route = useRoute();
       const queryParams = route.query;
-      const pathSegments = route.params.params || [];
-      return { queryParams, pathSegments };
+
+      // const pathSegments = route.path || [];
+      // const pathSegments = route;
+      // console.log('pathSegments' , this.pathSegments);
+
+      return { queryParams };
     } catch (error){
       console.error('Ошибка в url:', error);
     }
@@ -51,6 +55,38 @@ export default defineNuxtComponent({
     };
   },
 
+  created() {
+     const urlPath = this.$route.path || [];
+
+    //  const urlPath = { ...this.$route.path } || [];
+    //  const pathSegments = this.path || [];
+    //  const currentQuery = { ...this.$route };
+
+    console.log('currentQuery' , urlPath);
+
+    const parts = urlPath.split('/');
+    const catalogIndex = parts.indexOf('catalog');
+
+    // if (catalogIndex !== -1 && catalogIndex + 1 < parts.length) {
+    //   for (let i = catalogIndex + 1; i < parts.length; i++) {
+    //     if (parts[i]) {
+    //       this.selectedItems.push(parts[i]);
+    //     }
+    //   }
+    // }
+
+    if (catalogIndex !== -1 && catalogIndex + 1 < parts.length) {
+      this.selectedItems.push(
+          ...parts.slice(catalogIndex + 1).filter(part => part)
+      );
+    }
+
+    Object.values(this.queryParams).forEach(value => {
+      this.selectedItems.push(...value.split(','));
+    });
+
+  },
+
   methods: {
     handleCheckboxChange(itemKey, categoryIndex, type) {
 
@@ -60,31 +96,11 @@ export default defineNuxtComponent({
         this.updateParentOnSubcategoryChange(categoryIndex);
       }
 
-      //this.updateSelectedItems();
-      // console.log('categoriesFilters', this.categoriesFilters);
-
       const { pathSegments, queryParams } = this.createFilterParams();
       const { segments, parameters } = this.processFilterParams(pathSegments, queryParams);
 
       this.updateRoute(segments, parameters);
     },
-
-    // updateSelectedItems() {
-    //   this.selectedItems = [];
-    //   this.categoriesFilters.forEach((category) => {
-    //     category.items.forEach((item) => {
-    //       if (item.isChecked) this.selectedItems.push(item.key);
-    //     });
-    //     if (category.subCategories) {
-    //       category.subCategories.forEach((subCategory) => {
-    //         subCategory.items.forEach((subItem) => {
-    //           if (subItem.isChecked) this.selectedItems.push(subItem.key);
-    //         });
-    //       });
-    //     }
-    //   });
-    // },
-
 
     updateParentCategory(categoryIndex) {
       const category = this.categoriesFilters[categoryIndex];
@@ -105,7 +121,7 @@ export default defineNuxtComponent({
         category.items.forEach((item) => {
           if (!this.selectedItems.includes(item.key)) {
             this.selectedItems.push(item.key);
-            item.isChecked = true;
+            // item.isChecked = true;
           }
         });
       }
@@ -115,7 +131,7 @@ export default defineNuxtComponent({
           subCategory.items.forEach((subItem) => {
             if (!this.selectedItems.includes(subItem.key)) {
               this.selectedItems.push(subItem.key);
-              subItem.isChecked = true;
+              // subItem.isChecked = true;
             }
           });
         });
@@ -129,7 +145,7 @@ export default defineNuxtComponent({
           this.selectedItems = this.selectedItems.filter(
               (selected) => selected !== item.key
           );
-          item.isChecked = false;
+          // item.isChecked = false;
         });
       }
 
@@ -139,7 +155,7 @@ export default defineNuxtComponent({
             this.selectedItems = this.selectedItems.filter(
                 (selected) => selected !== subItem.key
             );
-            subItem.isChecked = false;
+            // subItem.isChecked = false;
           });
         });
       }
@@ -160,13 +176,13 @@ export default defineNuxtComponent({
       if (isAnySubcategoryChecked) {
         if (!this.selectedItems.includes(category.items[0].key)) {
           this.selectedItems.push(category.items[0].key);
-          category.items[0].isChecked = true;
+          // category.items[0].isChecked = true;
         }
       } else {
         this.selectedItems = this.selectedItems.filter(
           (selected) => selected !== category.items[0].key
         );
-          category.items[0].isChecked = false;
+          // category.items[0].isChecked = false;
       }
     },
 
@@ -238,10 +254,12 @@ export default defineNuxtComponent({
       const pathSegments = [];
 
       if (segments.category) {
-        pathSegments.push(`category-${segments.category}`);
+        //pathSegments.push(`category-${segments.category}`);
+        pathSegments.push(`${segments.category}`);
       }
       if (segments.collection) {
-        pathSegments.push(`collection-${segments.collection}`);
+        //pathSegments.push(`collection-${segments.collection}`);
+        pathSegments.push(`${segments.collection}`);
       }
       const path = pathSegments.length > 0 ? `/catalog/${pathSegments.join('/')}/` : '/catalog/';
 
@@ -252,26 +270,16 @@ export default defineNuxtComponent({
     },
   },
 
-  watch: {
-    categoriesFilters: {
-      deep: true,
-      handler(categoriesFilters) {
-        this.$filtersStore.categoriesFilters = categoriesFilters;
-        // console.log('categoriesFilters', categoriesFilters);
-        // console.log('this.$filtersStore.categoriesFilters', this.$filtersStore.categoriesFilters);
-      },
-    },
-  },
-
-  created() {
-    console.log('queryParams' , this.queryParams);
-    console.log('pathSegments' , this.pathSegments);
-    Object.values(this.queryParams).forEach(value => {
-      this.selectedItems.push(...value.split(','));
-    });
-    //this.updateSelectedItems();
-  },
-
+  // watch: {
+  //   categoriesFilters: {
+  //     deep: true,
+  //     handler(categoriesFilters) {
+  //       this.$filtersStore.categoriesFilters = categoriesFilters;
+  //       // console.log('categoriesFilters', categoriesFilters);
+  //       // console.log('this.$filtersStore.categoriesFilters', this.$filtersStore.categoriesFilters);
+  //     },
+  //   },
+  // },
 
 });
 </script>
