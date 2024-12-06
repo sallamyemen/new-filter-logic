@@ -38,10 +38,6 @@ export default defineNuxtComponent({
       const route = useRoute();
       const queryParams = route.query;
 
-      // const pathSegments = route.path || [];
-      // const pathSegments = route;
-      // console.log('pathSegments' , this.pathSegments);
-
       return { queryParams };
     } catch (error){
       console.error('Ошибка в url:', error);
@@ -56,34 +52,29 @@ export default defineNuxtComponent({
   },
 
   created() {
-     const urlPath = this.$route.path || [];
-
-    //  const urlPath = { ...this.$route.path } || [];
-    //  const pathSegments = this.path || [];
-    //  const currentQuery = { ...this.$route };
+    const urlPath = this.$route.path || [];
 
     console.log('currentQuery' , urlPath);
 
     const parts = urlPath.split('/');
     const catalogIndex = parts.indexOf('catalog');
 
-    // if (catalogIndex !== -1 && catalogIndex + 1 < parts.length) {
-    //   for (let i = catalogIndex + 1; i < parts.length; i++) {
-    //     if (parts[i]) {
-    //       this.selectedItems.push(parts[i]);
-    //     }
-    //   }
-    // }
+    if (catalogIndex !== -1 && catalogIndex + 1 < parts.length) {
+      parts.slice(catalogIndex + 1).forEach(part => {
+        if (part) {
+          const index = this.selectedItems.indexOf(part);
+          if (index !== -1) {
+            this.selectedItems.splice(index, 1);
+          } else {
+            this.selectedItems.push(part);
+          }
+        }
+      });
+    }
 
     Object.values(this.queryParams).forEach(value => {
       this.selectedItems.push(...value.split(','));
     });
-
-    if (catalogIndex !== -1 && catalogIndex + 1 < parts.length) {
-      this.selectedItems.push(
-          ...parts.slice(catalogIndex + 1).filter(part => part)
-      );
-    }
 
   },
 
@@ -107,7 +98,7 @@ export default defineNuxtComponent({
       const isParentChecked = this.selectedItems.includes(category.items[0].key);
 
       if (isParentChecked) {
-        this.selectAllSubcategories(category);
+        //this.selectAllSubcategories(category);
       } else {
         this.deselectAllSubcategories(category);
       }
