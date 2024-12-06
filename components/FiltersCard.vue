@@ -36,9 +36,8 @@ export default defineNuxtComponent({
   asyncData(nuxtApp) {
     try{
       const route = useRoute();
-      const queryParams = route.query;
 
-      return { queryParams };
+      return { route };
     } catch (error){
       console.error('Ошибка в url:', error);
     }
@@ -53,8 +52,10 @@ export default defineNuxtComponent({
 
   created() {
     const urlPath = this.$route.path || [];
+    const queryParams = this.$route.query;
 
-    console.log('currentQuery' , urlPath);
+    // console.log('currentQuery' , urlPath);
+    // console.log('currentParams' , queryParams);
 
     const parts = urlPath.split('/');
     const catalogIndex = parts.indexOf('catalog');
@@ -72,7 +73,7 @@ export default defineNuxtComponent({
       });
     }
 
-    Object.values(this.queryParams).forEach(value => {
+    Object.values(queryParams).forEach(value => {
       this.selectedItems.push(...value.split(','));
     });
 
@@ -98,7 +99,7 @@ export default defineNuxtComponent({
       const isParentChecked = this.selectedItems.includes(category.items[0].key);
 
       if (isParentChecked) {
-        //this.selectAllSubcategories(category);
+        this.selectAllSubcategories(category);
       } else {
         this.deselectAllSubcategories(category);
       }
