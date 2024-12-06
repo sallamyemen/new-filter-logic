@@ -75,15 +75,15 @@ export default defineNuxtComponent({
     //   }
     // }
 
+    Object.values(this.queryParams).forEach(value => {
+      this.selectedItems.push(...value.split(','));
+    });
+
     if (catalogIndex !== -1 && catalogIndex + 1 < parts.length) {
       this.selectedItems.push(
           ...parts.slice(catalogIndex + 1).filter(part => part)
       );
     }
-
-    Object.values(this.queryParams).forEach(value => {
-      this.selectedItems.push(...value.split(','));
-    });
 
   },
 
