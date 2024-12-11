@@ -28,6 +28,20 @@ export default defineNuxtComponent({
       default: "",
     },
   },
+  // async asyncData({ $productsStore }) {
+  //   try {
+  //     const products = await $productsStore.fetchProducts();
+  //     return {
+  //       products,
+  //     };
+  //   } catch (error) {
+  //     console.error("Ошибка при загрузке продуктов:", error);
+  //     return {
+  //       products: [],
+  //     };
+  //   }
+  // },
+
   data() {
     return {
       products: []

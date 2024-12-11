@@ -22,23 +22,56 @@
 
 <script>
 export default defineNuxtComponent({
+
+  // asyncData(nuxtApp) {
+  //   try{
+  //     const route = useRoute();
+  //     return { route };
+  //   } catch (error){
+  //     console.error('Ошибка в url:', error);
+  //   }
+  // },
+
   props: {
     name: {
       type: String,
       default: "",
     },
   },
+
   data() {
     return {
       products: []
     };
   },
+
   computed: {
     filteredProducts() {
-      // console.log(this.products);
-      return this.products.slice(6, -4).map(product => product.goods_list);
+
+      const urlPath = this.$route.path || [];
+      const parts = urlPath.split('/');
+      const catalogIndex = parts.indexOf('catalog');
+
+      if (catalogIndex !== -1 && catalogIndex + 1 < parts.length) {
+        const filteredParts = parts.slice(catalogIndex + 1).filter(Boolean);
+        const lastPart = filteredParts[filteredParts.length - 1];
+
+        if (lastPart) {
+          switch (lastPart) {
+            case "cosmeceuticals":
+                return this.products.slice(8, -2).map(product => product.goods_list);
+            case "nutraceuticals":
+              return this.products.slice(4, 7).map(product => product.goods_list);
+            case "titanium-bracelets":
+              return this.products.slice(9, -1).map(product => product.goods_list);
+            default:
+              return [];
+          }
+        }
+      }
     },
   },
+
   mounted() {
     this.$productsStore.fetchProducts()
         .then(products => {

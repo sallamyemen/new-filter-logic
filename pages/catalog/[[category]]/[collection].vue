@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
     <FiltersCard class="filter"  />
-    <CosmeceuticalsCard class="cosmeceuticals"  />
+    <CollectionCard class="collection"  />
   </div>
 </template>
 
@@ -9,7 +9,7 @@
 .wrapper {
   display: flex;
 }
-.cosmeceuticals{
+.collection{
   width: 40%;
 }
 .product-list {

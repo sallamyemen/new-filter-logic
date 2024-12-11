@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
     <FiltersCard class="filter"  />
-    <DirectHitCard class="nutraceuticals"  />
+    <CategoryCard class="category"  />
   </div>
 </template>
 
@@ -9,7 +9,7 @@
 .wrapper {
   display: flex;
 }
-.nutraceuticals{
+.category{
   width: 40%;
 }
 .product-list {
