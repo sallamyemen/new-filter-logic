@@ -1,19 +1,16 @@
 <template>
   <div class="wrapper">
-    <FiltersCard class="filter"  />
-    <CollectionCard class="collection"  />
+    <FiltersAside class="filter"  />
+    <Collections class="collections"  />
   </div>
 </template>
 
 <style scoped>
 .wrapper {
   display: flex;
-}
-.collection{
-  width: 40%;
-}
-.product-list {
-  display: flex;
-  flex-wrap: wrap;
+
+  .collections {
+    width: 40%;
+  }
 }
 </style>

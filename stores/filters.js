@@ -5,14 +5,14 @@ export const useFiltersStore = defineStore("filters", {
         categoriesFilters: [
             {
                 title: 'Nutraceuticals',
-                key: 'category',
+                key: 'categories',
                 items: [
                     { title: 'Nutraceuticals', key: 'nutraceuticals', isChecked: false },
                 ],
                 subCategories: [
                     {
-                        title: 'Collection',
-                        key: 'collection',
+                        title: 'Collections',
+                        key: 'collections',
                         items: [
                             { title: 'Classic Hit', key: 'classic-hit', isChecked: false },
                             { title: 'Direct Hit', key: 'direct-hit', isChecked: false },
@@ -27,14 +27,14 @@ export const useFiltersStore = defineStore("filters", {
             },
             {
                 title: 'Cosmeceuticals',
-                key: 'category',
+                key: 'categories',
                 items: [
                     { title: 'Cosmeceuticals', key: 'cosmeceuticals', isChecked: false },
                 ],
                 subCategories: [
                     {
-                        title: 'Collection',
-                        key: 'collection',
+                        title: 'Collections',
+                        key: 'collections',
                         items: [
                             { title: 'Switzerland Cosmetics', key: 'switzerland-cosmetics', isChecked: false },
                             { title: 'Premium French Care', key: 'premium-french-care', isChecked: false },
@@ -46,14 +46,14 @@ export const useFiltersStore = defineStore("filters", {
             },
             {
                 title: 'Titanium Bracelets',
-                key: 'category',
+                key: 'categories',
                 items: [
                     { title: 'Titanium Bracelets', key: 'titanium-bracelets', isChecked: false },
                 ],
                 subCategories: [
                     {
-                        title: 'Collection',
-                        key: 'collection',
+                        title: 'Collections',
+                        key: 'collections',
                         items: [
                             { title: 'Trinity Power', key: 'trinity-power', isChecked: false },
                         ],
@@ -83,14 +83,14 @@ export const useFiltersStore = defineStore("filters", {
             },
             {
                 title: 'Purpose',
-                key: 'problem',
+                key: 'purpose',
                 items: [
                     { title: null, key: null, isChecked: false },
                 ],
                 subCategories: [
                     {
                         title: 'Purpose',
-                        key: 'problem',
+                        key: 'purpose',
                         items:[
                             { title: 'Anti-Age', key: 'anti-age', isChecked: false },
                             { title: 'Brain Activity', key: 'brain-activity', isChecked: false },

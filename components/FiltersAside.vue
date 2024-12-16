@@ -33,16 +33,6 @@
 <script>
 export default defineNuxtComponent({
 
-  asyncData(nuxtApp) {
-    try{
-      const route = useRoute();
-
-      return { route };
-    } catch (error){
-      console.error('Ошибка в url:', error);
-    }
-  },
-
   data() {
     return {
       selectedItems: [],
@@ -50,33 +40,20 @@ export default defineNuxtComponent({
     };
   },
 
-  created() {
-    const urlPath = this.$route.path || [];
-    const queryParams = this.$route.query;
-
-    // console.log('currentQuery' , urlPath);
-    // console.log('currentParams' , queryParams);
-
-    const parts = urlPath.split('/');
-    const catalogIndex = parts.indexOf('catalog');
-
-    if (catalogIndex !== -1 && catalogIndex + 1 < parts.length) {
-      parts.slice(catalogIndex + 1).forEach(part => {
-        if (part) {
-          const index = this.selectedItems.indexOf(part);
-          if (index !== -1) {
-            this.selectedItems.splice(index, 1);
-          } else {
-            this.selectedItems.push(part);
-          }
-        }
-      });
+  mounted() {
+    if(typeof this.$route.params.category !== "undefined")
+    {
+      this.selectedItems.push(this.$route.params.category);
     }
 
-    Object.values(queryParams).forEach(value => {
+    if(typeof this.$route.params.collection !== "undefined")
+    {
+      this.selectedItems.push(this.$route.params.collection);
+    }
+
+    Object.values(this.$route.query).forEach(value => {
       this.selectedItems.push(...value.split(','));
     });
-
   },
 
   methods: {
@@ -113,7 +90,6 @@ export default defineNuxtComponent({
         category.items.forEach((item) => {
           if (!this.selectedItems.includes(item.key)) {
             this.selectedItems.push(item.key);
-            // item.isChecked = true;
           }
         });
       }
@@ -123,7 +99,6 @@ export default defineNuxtComponent({
           subCategory.items.forEach((subItem) => {
             if (!this.selectedItems.includes(subItem.key)) {
               this.selectedItems.push(subItem.key);
-              // subItem.isChecked = true;
             }
           });
         });
@@ -137,7 +112,6 @@ export default defineNuxtComponent({
           this.selectedItems = this.selectedItems.filter(
               (selected) => selected !== item.key
           );
-          // item.isChecked = false;
         });
       }
 
@@ -147,7 +121,6 @@ export default defineNuxtComponent({
             this.selectedItems = this.selectedItems.filter(
                 (selected) => selected !== subItem.key
             );
-            // subItem.isChecked = false;
           });
         });
       }
@@ -168,13 +141,11 @@ export default defineNuxtComponent({
       if (isAnySubcategoryChecked) {
         if (!this.selectedItems.includes(category.items[0].key)) {
           this.selectedItems.push(category.items[0].key);
-          // category.items[0].isChecked = true;
         }
       } else {
         this.selectedItems = this.selectedItems.filter(
           (selected) => selected !== category.items[0].key
         );
-          // category.items[0].isChecked = false;
       }
     },
 
@@ -183,9 +154,9 @@ export default defineNuxtComponent({
       const queryParams = {};
 
       this.selectedItems.forEach(item => {
-        const { categoryKey, parentKey } = this.findCategoryKey(item, this.categoriesFilters);
+        const { categoryKey, parentKey } = this.findCategoryKeyBySelectedItem(item, this.categoriesFilters);
 
-        if (!categoryKey.includes("category") && !categoryKey.includes("collection")) {
+        if (!categoryKey.includes("categories") && !categoryKey.includes("collections")) {
           queryParams[categoryKey] = queryParams[categoryKey] || [];
           queryParams[categoryKey].push(item);
         } else {
@@ -198,7 +169,7 @@ export default defineNuxtComponent({
       return { pathSegments, queryParams };
     },
 
-    findCategoryKey(itemKey, categories, parentKey = null) {
+    findCategoryKeyBySelectedItem(itemKey, categories, parentKey = null) {
       for (const category of categories) {
         if (category.items && category.items.some(item => item.key === itemKey)) {
           return { categoryKey: category.key, parentKey };
@@ -230,7 +201,7 @@ export default defineNuxtComponent({
       }
 
       for (const [key, value] of Object.entries(queryParams)) {
-        if (key === "collection") {
+        if (key === "collections") {
           if (value.length > 0) {
             segments[key] = value[0];
           }
@@ -245,33 +216,17 @@ export default defineNuxtComponent({
 
       const pathSegments = [];
 
-      if (segments.category) {
-        //pathSegments.push(`category-${segments.category}`);
-        pathSegments.push(`${segments.category}`);
+      if (segments.categories) {
+        pathSegments.push(`${segments.categories}`);
       }
-      if (segments.collection) {
-        //pathSegments.push(`collection-${segments.collection}`);
-        pathSegments.push(`${segments.collection}`);
+      if (segments.collections) {
+        pathSegments.push(`${segments.collections}`);
       }
       const path = pathSegments.length > 0 ? `/catalog/${pathSegments.join('/')}/` : '/catalog/';
-
-      // console.log('path', path);
-      // console.log('parameters', parameters);
 
       this.$router.push({ path, query: parameters });
     },
   },
-
-  // watch: {
-  //   categoriesFilters: {
-  //     deep: true,
-  //     handler(categoriesFilters) {
-  //       this.$filtersStore.categoriesFilters = categoriesFilters;
-  //       // console.log('categoriesFilters', categoriesFilters);
-  //       // console.log('this.$filtersStore.categoriesFilters', this.$filtersStore.categoriesFilters);
-  //     },
-  //   },
-  // },
 
 });
 </script>
