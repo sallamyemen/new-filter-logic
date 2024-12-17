@@ -1,7 +1,7 @@
 <template>
   <div class="wrapper">
-    <FiltersAside class="filter"  />
-    <Categories class="categories"  />
+    <FiltersAside class="filters"  />
+    <Collections class="collections"  />
   </div>
 </template>
 
@@ -9,7 +9,7 @@
 .wrapper {
   display: flex;
 
-  .categories {
+  .collections {
     width: 40%;
   }
 }

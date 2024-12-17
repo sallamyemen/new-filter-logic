@@ -23,19 +23,6 @@
 <script>
 export default defineNuxtComponent({
 
-  // asyncData(nuxtApp) {
-  //   try{
-  //     const route = useRoute();
-  //     //const products = await $productsStore.fetchProducts();
-  //     // return { route, products };
-  //     return { route };
-  //   } catch (error){
-  //     console.error('Ошибка:', error);
-  //   }
-  // },
-
-
-
   props: {
     name: {
       type: String,
@@ -52,16 +39,11 @@ export default defineNuxtComponent({
   computed: {
     filteredProducts() {
 
-      const urlPath = this.$route.path || [];
-      const parts = urlPath.split('/');
-      const catalogIndex = parts.indexOf('catalog');
-
-      if (catalogIndex !== -1 && catalogIndex + 1 < parts.length) {
-        const filteredParts = parts.slice(catalogIndex + 1).filter(Boolean);
-        const lastPart = filteredParts[filteredParts.length - 1];
-
-        if (lastPart) {
-          switch (lastPart) {
+      if(typeof this.$route.params.category !== "undefined")
+      {
+        if(typeof this.$route.params.collection !== "undefined")
+        {
+          switch (this.$route.params.collection) {
             case "classic-hit":
               return this.products.slice(5, -5).map(product => product.goods_list);
             case "direct-hit":
@@ -78,11 +60,24 @@ export default defineNuxtComponent({
               return this.products.slice(8, -2).map(product => product.goods_list);
             case "trinity-power":
               return this.products.slice(9, -1).map(product => product.goods_list);
-            default:
-              return [];
           }
         }
+
+        switch (this.$route.params.category) {
+          case "cosmeceuticals":
+            return this.products.slice(8, -2).map(product => product.goods_list);
+          case "nutraceuticals":
+            return this.products.slice(4, 7).map(product => product.goods_list);
+          case "titanium-bracelets":
+            return this.products.slice(9, -1).map(product => product.goods_list);
+          default:
+            return [];
+        }
+
+      }else{
+        return [];
       }
+
     },
   },
 
@@ -92,7 +87,7 @@ export default defineNuxtComponent({
           this.products = products;
         })
         .catch(error => {
-          console.error('Ошибка при загрузке продуктов:', error);
+          console.error('Error during loading products:', error);
         });
   },
 });

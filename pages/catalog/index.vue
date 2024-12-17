@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <FiltersAside class="filter"  />
+    <FiltersAside class="filters"  />
     <AllProducts class="products" />
   </div>
 </template>
@@ -11,10 +11,11 @@
 
   .products{
     width: 40%;
+    .product-list {
+      display: flex;
+      flex-wrap: wrap;
+    }
   }
-  .product-list {
-    display: flex;
-    flex-wrap: wrap;
-  }
+
 }
 </style>

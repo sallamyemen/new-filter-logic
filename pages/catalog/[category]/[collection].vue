@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <FiltersAside class="filter"  />
+    <FiltersAside class="filters"  />
     <Collections class="collections"  />
   </div>
 </template>

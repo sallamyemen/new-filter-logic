@@ -1,16 +1,16 @@
 <template>
   <div class="products">
     <h1>Товары</h1>
-    <div class="productList">
+    <div class="products__list">
       <div
-          v-for="productlist in filteredProducts"
+          v-for="productlist in listОfProducts"
           :key="productlist.name"
-          class="productsList"
+          class="products__list"
       >
         <div
             v-for="product in productlist"
             :key="product.name"
-            class="singleProduct"
+            class="products__single-product"
         >
           <h2>{{ product.name }}</h2>
           <img :src="product.images[0].path" :alt="product.name" />
@@ -28,19 +28,6 @@ export default defineNuxtComponent({
       default: "",
     },
   },
-  // async asyncData({ $productsStore }) {
-  //   try {
-  //     const products = await $productsStore.fetchProducts();
-  //     return {
-  //       products,
-  //     };
-  //   } catch (error) {
-  //     console.error("Ошибка при загрузке продуктов:", error);
-  //     return {
-  //       products: [],
-  //     };
-  //   }
-  // },
 
   data() {
     return {
@@ -48,7 +35,7 @@ export default defineNuxtComponent({
     };
   },
   computed: {
-    filteredProducts() {
+    listОfProducts() {
       return this.products.slice(4, 9).map(product => product.goods_list);
     },
   },
@@ -58,7 +45,7 @@ export default defineNuxtComponent({
           this.products = products;
         })
         .catch(error => {
-          console.error('Ошибка при загрузке продуктов:', error);
+          console.error('Error during loading products:', error);
         });
   },
 });
@@ -67,9 +54,11 @@ export default defineNuxtComponent({
 <style scoped>
 .products{
   width: 40%;
+
+  &__list {
+    display: flex;
+    flex-wrap: wrap;
+  }
 }
-.productList {
-  display: flex;
-  flex-wrap: wrap;
-}
+
 </style>

@@ -20,7 +20,7 @@ export const useProductsStore = defineStore("products", {
                 return this.products;
 
             } catch (error) {
-                console.error("Ошибка при получении товаров:", error);
+                console.error("Error failed fetching products:", error);
             }
         },
     },
