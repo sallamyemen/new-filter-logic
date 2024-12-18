@@ -39,6 +39,8 @@ export default defineNuxtComponent({
   computed: {
     filteredProducts() {
 
+      console.log(this.products);
+
       if(typeof this.$route.params.category !== "undefined")
       {
         if(typeof this.$route.params.collection !== "undefined")

@@ -8,9 +8,9 @@
 <style scoped>
 .wrapper {
   display: flex;
+}
 
-  .collections {
-    width: 40%;
-  }
+.collections {
+  width: 40%;
 }
 </style>

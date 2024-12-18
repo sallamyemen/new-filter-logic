@@ -1,21 +1,16 @@
 <template>
   <div class="wrapper">
     <FiltersAside class="filters"  />
-    <AllProducts class="products" />
+    <AllProducts class="all-products" />
   </div>
 </template>
 
 <style scoped>
 .wrapper {
   display: flex;
+}
 
-  .products{
-    width: 40%;
-    .product-list {
-      display: flex;
-      flex-wrap: wrap;
-    }
-  }
-
+.all-products{
+  width: 40%;
 }
 </style>

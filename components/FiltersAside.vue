@@ -87,43 +87,71 @@ export default defineNuxtComponent({
     selectAllSubcategories(category) {
 
       if (category.items) {
-        category.items.forEach((item) => {
-          if (!this.selectedItems.includes(item.key)) {
-            this.selectedItems.push(item.key);
-          }
-        });
+        const newItems = category.items.filter(item => !this.selectedItems.includes(item.key)).map(item => item.key);
+        this.selectedItems.push(...newItems);
       }
 
+      // if (category.items) {
+      //   category.items.forEach((item) => {
+      //     if (!this.selectedItems.includes(item.key)) {
+      //       this.selectedItems.push(item.key);
+      //     }
+      //   });
+      // }
+
+
       if (category.subCategories) {
-        category.subCategories.forEach((subCategory) => {
-          subCategory.items.forEach((subItem) => {
-            if (!this.selectedItems.includes(subItem.key)) {
-              this.selectedItems.push(subItem.key);
-            }
-          });
-        });
+        const newItems = category.subCategories.reduce((acc, subCategory) => {
+          const keys = subCategory.items.filter(subItem => !this.selectedItems.includes(subItem.key)).map(subItem => subItem.key);
+          return acc.concat(keys);
+        }, []);
+
+        this.selectedItems.push(...newItems);
       }
+      // if (category.subCategories) {
+      //   category.subCategories.forEach((subCategory) => {
+      //     subCategory.items.forEach((subItem) => {
+      //       if (!this.selectedItems.includes(subItem.key)) {
+      //         this.selectedItems.push(subItem.key);
+      //       }
+      //     });
+      //   });
+      // }
     },
 
     deselectAllSubcategories(category) {
 
       if (category.items) {
-        category.items.forEach((item) => {
-          this.selectedItems = this.selectedItems.filter(
-              (selected) => selected !== item.key
-          );
-        });
+        const keysToRemove = category.items.map(item => item.key);
+
+        this.selectedItems = this.selectedItems.filter(selected => !keysToRemove.includes(selected));
       }
 
+      // if (category.items) {
+      //   category.items.forEach((item) => {
+      //     this.selectedItems = this.selectedItems.filter(
+      //         (selected) => selected !== item.key
+      //     );
+      //   });
+      // }
+
       if (category.subCategories) {
-        category.subCategories.forEach((subCategory) => {
-          subCategory.items.forEach((subItem) => {
-            this.selectedItems = this.selectedItems.filter(
-                (selected) => selected !== subItem.key
-            );
-          });
-        });
+        const keysToRemove = category.subCategories.flatMap(subCategory =>
+            subCategory.items.map(subItem => subItem.key)
+        );
+
+        this.selectedItems = this.selectedItems.filter(selected => !keysToRemove.includes(selected));
       }
+
+      // if (category.subCategories) {
+      //   category.subCategories.forEach((subCategory) => {
+      //     subCategory.items.forEach((subItem) => {
+      //       this.selectedItems = this.selectedItems.filter(
+      //           (selected) => selected !== subItem.key
+      //       );
+      //     });
+      //   });
+      // }
     },
 
     updateParentOnSubcategoryChange(categoryIndex) {

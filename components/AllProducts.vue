@@ -3,7 +3,7 @@
     <h1>Товары</h1>
     <div class="products__list">
       <div
-          v-for="productlist in listОfProducts"
+          v-for="productlist in listОfAllProducts"
           :key="productlist.name"
           class="products__list"
       >
@@ -35,7 +35,7 @@ export default defineNuxtComponent({
     };
   },
   computed: {
-    listОfProducts() {
+    listОfAllProducts() {
       return this.products.slice(4, 9).map(product => product.goods_list);
     },
   },
