@@ -65,20 +65,22 @@ export default defineNuxtComponent({
         this.updateParentOnSubcategoryChange(categoryIndex);
       }
 
-      const { pathSegments, queryParams } = this.createFilterParams();
-      const { segments, parameters } = this.processFilterParams(pathSegments, queryParams);
+      let { pathSegments, queryParams } = this.createFilterParams();
+      let { segments, parameters } = this.processFilterParams(pathSegments, queryParams);
 
       this.updateRoute(segments, parameters);
     },
 
     updateParentCategory(categoryIndex) {
-      const category = this.categoriesFilters[categoryIndex];
-      const isParentChecked = this.selectedItems.includes(category.items[0].key);
+      // const category = this.categoriesFilters[categoryIndex];
+      const CATEGORY = this.categoriesFilters[categoryIndex];
+      // const isParentChecked = this.selectedItems.includes(CATEGORY.items[0].key);
+      const ISPARENTCHECKED = this.selectedItems.includes(CATEGORY.items[0].key);
 
-      if (isParentChecked) {
-        this.selectAllSubcategories(category);
+      if (ISPARENTCHECKED) {
+        this.selectAllSubcategories(CATEGORY);
       } else {
-        this.deselectAllSubcategories(category);
+        this.deselectAllSubcategories(CATEGORY);
       }
 
       this.selectedItems = [...new Set(this.selectedItems)];
@@ -87,79 +89,43 @@ export default defineNuxtComponent({
     selectAllSubcategories(category) {
 
       if (category.items) {
-        const newItems = category.items.filter(item => !this.selectedItems.includes(item.key)).map(item => item.key);
+
+        let newItems = category.items.filter(item => !this.selectedItems.includes(item.key)).map(item => item.key);
         this.selectedItems.push(...newItems);
       }
 
-      // if (category.items) {
-      //   category.items.forEach((item) => {
-      //     if (!this.selectedItems.includes(item.key)) {
-      //       this.selectedItems.push(item.key);
-      //     }
-      //   });
-      // }
-
-
       if (category.subCategories) {
-        const newItems = category.subCategories.reduce((acc, subCategory) => {
-          const keys = subCategory.items.filter(subItem => !this.selectedItems.includes(subItem.key)).map(subItem => subItem.key);
+        let newItems = category.subCategories.reduce((acc, subCategory) => {
+          let keys = subCategory.items.filter(subItem => !this.selectedItems.includes(subItem.key)).map(subItem => subItem.key);
           return acc.concat(keys);
         }, []);
 
         this.selectedItems.push(...newItems);
       }
-      // if (category.subCategories) {
-      //   category.subCategories.forEach((subCategory) => {
-      //     subCategory.items.forEach((subItem) => {
-      //       if (!this.selectedItems.includes(subItem.key)) {
-      //         this.selectedItems.push(subItem.key);
-      //       }
-      //     });
-      //   });
-      // }
+
     },
 
     deselectAllSubcategories(category) {
 
       if (category.items) {
-        const keysToRemove = category.items.map(item => item.key);
+        const KEYSTOREMOVE = category.items.map(item => item.key);
 
-        this.selectedItems = this.selectedItems.filter(selected => !keysToRemove.includes(selected));
+        this.selectedItems = this.selectedItems.filter(selected => !KEYSTOREMOVE.includes(selected));
       }
-
-      // if (category.items) {
-      //   category.items.forEach((item) => {
-      //     this.selectedItems = this.selectedItems.filter(
-      //         (selected) => selected !== item.key
-      //     );
-      //   });
-      // }
 
       if (category.subCategories) {
-        const keysToRemove = category.subCategories.flatMap(subCategory =>
-            subCategory.items.map(subItem => subItem.key)
-        );
+        const KEYSTOREMOVE = category.subCategories.flatMap(subCategory => subCategory.items.map(subItem => subItem.key));
 
-        this.selectedItems = this.selectedItems.filter(selected => !keysToRemove.includes(selected));
+        this.selectedItems = this.selectedItems.filter(selected => !KEYSTOREMOVE.includes(selected));
       }
-
-      // if (category.subCategories) {
-      //   category.subCategories.forEach((subCategory) => {
-      //     subCategory.items.forEach((subItem) => {
-      //       this.selectedItems = this.selectedItems.filter(
-      //           (selected) => selected !== subItem.key
-      //       );
-      //     });
-      //   });
-      // }
     },
 
     updateParentOnSubcategoryChange(categoryIndex) {
-      const category = this.categoriesFilters[categoryIndex];
+      const CATEGORY = this.categoriesFilters[categoryIndex];
 
       let isAnySubcategoryChecked = false;
-      if (category.subCategories) {
-        isAnySubcategoryChecked = category.subCategories.some((subCategory) =>
+      if (CATEGORY.subCategories) {
+        isAnySubcategoryChecked = CATEGORY.subCategories.some((subCategory) =>
             subCategory.items.some((subItem) =>
                 this.selectedItems.includes(subItem.key)
             )
@@ -167,22 +133,22 @@ export default defineNuxtComponent({
       }
 
       if (isAnySubcategoryChecked) {
-        if (!this.selectedItems.includes(category.items[0].key)) {
-          this.selectedItems.push(category.items[0].key);
+        if (!this.selectedItems.includes(CATEGORY.items[0].key)) {
+          this.selectedItems.push(CATEGORY.items[0].key);
         }
       } else {
         this.selectedItems = this.selectedItems.filter(
-          (selected) => selected !== category.items[0].key
+          (selected) => selected !== CATEGORY.items[0].key
         );
       }
     },
 
     createFilterParams() {
-      const pathSegments = {};
-      const queryParams = {};
+      let pathSegments = {};
+      let queryParams = {};
 
       this.selectedItems.forEach(item => {
-        const { categoryKey, parentKey } = this.findCategoryKeyBySelectedItem(item, this.categoriesFilters);
+        let { categoryKey, parentKey } = this.findCategoryKeyBySelectedItem(item, this.categoriesFilters);
 
         if (!categoryKey.includes("categories") && !categoryKey.includes("collections")) {
           queryParams[categoryKey] = queryParams[categoryKey] || [];
@@ -197,6 +163,7 @@ export default defineNuxtComponent({
       return { pathSegments, queryParams };
     },
 
+    /*  change to filter and correct const */
     findCategoryKeyBySelectedItem(itemKey, categories, parentKey = null) {
       for (const category of categories) {
         if (category.items && category.items.some(item => item.key === itemKey)) {
@@ -217,8 +184,8 @@ export default defineNuxtComponent({
     },
 
     processFilterParams(pathSegments, queryParams) {
-      const parameters = {};
-      const segments = {};
+      let parameters = {};
+      let segments = {};
 
       for (const [key, value] of Object.entries(pathSegments)) {
         if (value.length > 1) {
@@ -240,9 +207,11 @@ export default defineNuxtComponent({
       return {segments, parameters} ;
     },
 
+    /*  change to filter and correct const */
+
     updateRoute(segments, parameters) {
 
-      const pathSegments = [];
+      let pathSegments = [];
 
       if (segments.categories) {
         pathSegments.push(`${segments.categories}`);
@@ -250,7 +219,7 @@ export default defineNuxtComponent({
       if (segments.collections) {
         pathSegments.push(`${segments.collections}`);
       }
-      const path = pathSegments.length > 0 ? `/catalog/${pathSegments.join('/')}/` : '/catalog/';
+      let path = pathSegments.length > 0 ? `/catalog/${pathSegments.join('/')}/` : '/catalog/';
 
       this.$router.push({ path, query: parameters });
     },

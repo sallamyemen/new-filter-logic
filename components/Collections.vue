@@ -47,31 +47,31 @@ export default defineNuxtComponent({
         {
           switch (this.$route.params.collection) {
             case "classic-hit":
-              return this.products.slice(5, -5).map(product => product.goods_list);
+              return this.products.filter(product => product.name == 'CLASSIC HIT').map(product => product.goods_list);
             case "direct-hit":
-              return this.products.slice(6, -4).map(product => product.goods_list);
+              return this.products.filter(product => product.name == 'DIRECT HIT').map(product => product.goods_list);
             case "impulse-hit":
-              return this.products.slice(2, -8).map(product => product.goods_list);
+              return this.products.filter(product => product.name == 'V HIT').map(product => product.goods_list);
             case "junior-hit":
-              return this.products.slice(7, -3).map(product => product.goods_list);
+              return this.products.filter(product => product.name == 'JUNIOR HIT').map(product => product.goods_list);
             case "alphabet":
-              return this.products.slice(4, -6).map(product => product.goods_list);
+              return this.products.filter(product => product.name == 'V ALPHABET').map(product => product.goods_list);
             case "switzerland-cosmetics":
-              return this.products.slice(8, -2).map(product => product.goods_list);
+              return this.products.filter(product => product.name == 'BEAUTY HIT').map(product => product.goods_list);
             case "premium-french-care":
-              return this.products.slice(8, -2).map(product => product.goods_list);
+              return this.products.filter(product => product.name == 'BEAUTY HIT').map(product => product.goods_list);
             case "trinity-power":
-              return this.products.slice(9, -1).map(product => product.goods_list);
+              return this.products.filter(product => product.name == 'БРАСЛЕТЫ').map(product => product.goods_list);
           }
         }
 
         switch (this.$route.params.category) {
           case "cosmeceuticals":
-            return this.products.slice(8, -2).map(product => product.goods_list);
+            return this.products.filter(product => product.name == 'BEAUTY HIT').map(product => product.goods_list);
           case "nutraceuticals":
             return this.products.slice(4, 7).map(product => product.goods_list);
           case "titanium-bracelets":
-            return this.products.slice(9, -1).map(product => product.goods_list);
+            return this.products.filter(product => product.name == 'БРАСЛЕТЫ').map(product => product.goods_list);
           default:
             return [];
         }
