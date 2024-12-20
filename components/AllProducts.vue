@@ -13,7 +13,7 @@
             class="products__single-product"
         >
           <h2>{{ product.name }}</h2>
-          <img :src="product.images[0].path" :alt="product.name" />
+          <img :src="product?.images[0].path" :alt="product.name" />
         </div>
       </div>
     </div>
@@ -36,7 +36,7 @@ export default defineNuxtComponent({
   },
   computed: {
     listОfAllProducts() {
-      return this.products.slice(4, 9).map(product => product.goods_list);
+      return this.products?.slice(4, 9).map(product => product.goods_list);
     },
   },
   mounted() {

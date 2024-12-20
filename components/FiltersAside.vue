@@ -10,7 +10,7 @@
           </li>
         </ul>
       </div>
-      <div class="categories__subcategories" v-if="category.subCategories">
+      <div class="categories__sub-categories" v-if="category.subCategories">
         <div v-for="subCategory in category.subCategories" :key="subCategory.key">
           <ul class="ml-4">
             <li v-for="subItem in subCategory.items" :key="subItem.key">
@@ -40,7 +40,7 @@ export default defineNuxtComponent({
     };
   },
 
-  mounted() {
+  created() {
     if(typeof this.$route.params.category !== "undefined")
     {
       this.selectedItems.push(this.$route.params.category);
@@ -163,24 +163,46 @@ export default defineNuxtComponent({
       return { pathSegments, queryParams };
     },
 
-    /*  change to filter and correct const */
+
+    // findCategoryKeyBySelectedItem(itemKey, categories, parentKey = null) {
+    //   for (const category of categories) {
+    //     if (category.items && category.items.some(item => item.key === itemKey)) {
+    //       return { categoryKey: category.key, parentKey };
+    //     }
+    //     else if (category.subCategories) {
+    //       const matchingSubCategories = category.subCategories.filter(subCategory =>
+    //           subCategory.items && subCategory.items.some(item => item.key === itemKey)
+    //       );
+    //       if (matchingSubCategories.length > 0) {
+    //         const subCategory = matchingSubCategories[0];
+    //         return { categoryKey: subCategory.key, parentKey: category.key};
+    //       }
+    //     }
+    //   }
+    //
+    //   return { categoryKey: null, parentKey };
+    // },
+
     findCategoryKeyBySelectedItem(itemKey, categories, parentKey = null) {
-      for (const category of categories) {
+      let result = categories.reduce((acc, category) => {
+        if (acc) return acc;
+
         if (category.items && category.items.some(item => item.key === itemKey)) {
           return { categoryKey: category.key, parentKey };
         }
-        else if (category.subCategories) {
-          const matchingSubCategories = category.subCategories.filter(subCategory =>
-              subCategory.items && subCategory.items.some(item => item.key === itemKey)
-          );
-          if (matchingSubCategories.length > 0) {
-            const subCategory = matchingSubCategories[0];
-            return { categoryKey: subCategory.key, parentKey: category.key};
-          }
-        }
-      }
 
-      return { categoryKey: null, parentKey };
+        let matchingSubCategories = category.subCategories?.filter(subCategory =>
+            subCategory.items && subCategory.items.some(item => item.key === itemKey)
+        );
+
+        if (matchingSubCategories && matchingSubCategories.length > 0) {
+          let subCategory = matchingSubCategories[0];
+          return { categoryKey: subCategory.key, parentKey: category.key };
+        }
+        return acc;
+      }, null);
+
+      return result || { categoryKey: null, parentKey };
     },
 
     processFilterParams(pathSegments, queryParams) {
@@ -207,7 +229,7 @@ export default defineNuxtComponent({
       return {segments, parameters} ;
     },
 
-    /*  change to filter and correct const */
+
 
     updateRoute(segments, parameters) {
 
@@ -232,7 +254,7 @@ export default defineNuxtComponent({
 ul{
   list-style: none;
 }
-.categories__subcategories {
+.categories__sub-categories {
   margin-left: 1rem;
 }
 </style>
