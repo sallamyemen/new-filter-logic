@@ -20,7 +20,7 @@
           </li>
         </ul>
       </div>
-      <div class="categories__sub-categories" v-if="category.subCategories">
+      <div class="categories__subcategories" v-if="category.subCategories">
         <div v-for="subCategory in category.subCategories" :key="subCategory.key">
           <ul class="ml-4">
             <li v-for="subItem in subCategory.items" :key="subItem.key">
@@ -64,12 +64,12 @@ export default defineNuxtComponent({
   },
 
   created() {
-    if(typeof this.$route.params.category !== "undefined") {
+    if(this.$route.params.category) {
       this.selectedItems
           .push(this.$route.params.category);
     }
 
-    if(typeof this.$route.params.collection !== "undefined") {
+    if(this.$route.params.collection) {
       this.selectedItems
           .push(this.$route.params.collection);
     }
@@ -84,10 +84,10 @@ export default defineNuxtComponent({
   methods: {
     handleCheckboxChange(itemKey, categoryIndex, type) {
 
-      if (type === "parent") {
+      if (type === 'parent') {
         this
             .updateParentCategory(categoryIndex);
-      } else if (type === "subcategory") {
+      } else if (type === 'subcategory') {
         this
             .updateParentOnSubcategoryChange(categoryIndex);
       }
@@ -102,16 +102,16 @@ export default defineNuxtComponent({
 
     updateParentCategory(categoryIndex) {
 
-      const CATEGORY = this.categoriesFilters[categoryIndex];
-      const ISPARENTCHECKED = this.selectedItems
-          .includes(CATEGORY.items[0].key);
+      let category = this.categoriesFilters[categoryIndex];
+      const isParentChecked = this.selectedItems
+          .includes(category.items[0].key);
 
-      if (ISPARENTCHECKED) {
+      if (isParentChecked) {
         this
-            .selectAllSubcategories(CATEGORY);
+            .selectAllSubcategories(category);
       } else {
         this
-            .deselectAllSubcategories(CATEGORY);
+            .deselectAllSubcategories(category);
       }
 
       this.selectedItems = [...new Set(this.selectedItems)];
@@ -147,31 +147,31 @@ export default defineNuxtComponent({
     deselectAllSubcategories(category) {
 
       if (category.items) {
-        const KEYSTOREMOVE = category.items
+        const keysToRemove = category.items
             .map(item => item.key);
 
         this.selectedItems = this.selectedItems
-            .filter(selected => !KEYSTOREMOVE
+            .filter(selected => !keysToRemove
                 .includes(selected));
       }
 
       if (category.subCategories) {
-        const KEYSTOREMOVE = category.subCategories
+        const keysToRemove = category.subCategories
             .flatMap(subCategory => subCategory.items
                 .map(subItem => subItem.key));
 
         this.selectedItems = this.selectedItems
-            .filter(selected => !KEYSTOREMOVE
+            .filter(selected => !keysToRemove
                 .includes(selected));
       }
     },
 
     updateParentOnSubcategoryChange(categoryIndex) {
-      const CATEGORY = this.categoriesFilters[categoryIndex];
+      let category = this.categoriesFilters[categoryIndex];
 
       let isAnySubcategoryChecked = false;
-      if (CATEGORY.subCategories) {
-        isAnySubcategoryChecked = CATEGORY.subCategories
+      if (category.subCategories) {
+        isAnySubcategoryChecked = category.subCategories
             .some((subCategory) =>
             subCategory.items
                 .some((subItem) =>
@@ -183,14 +183,14 @@ export default defineNuxtComponent({
 
       if (isAnySubcategoryChecked) {
         if (!this.selectedItems
-            .includes(CATEGORY.items[0].key)) {
+            .includes(category.items[0].key)) {
           this.selectedItems
-              .push(CATEGORY.items[0].key);
+              .push(category.items[0].key);
         }
       } else {
         this.selectedItems = this.selectedItems
             .filter(
-          (selected) => selected !== CATEGORY.items[0].key
+          (selected) => selected !== category.items[0].key
         );
       }
     },
@@ -201,12 +201,12 @@ export default defineNuxtComponent({
 
       this.selectedItems
           .forEach(item => {
-        let { categoryKey, parentKey } = this
+            let { categoryKey, parentKey } = this
             .findCategoryKeyBySelectedItem(item, this.categoriesFilters);
 
             if (categoryKey
-                .includes("categories") || categoryKey
-                .includes("collections")) {
+                .includes('categories') || categoryKey
+                .includes('collections')) {
               pathSegments[categoryKey] = pathSegments[categoryKey] || [];
               pathSegments[categoryKey]
                   .push(item);
@@ -261,7 +261,7 @@ export default defineNuxtComponent({
 
       for (const [key, value] of Object
           .entries(queryParams)) {
-        if (key === "collections") {
+        if (key === 'collections') {
           if (value.length > 0) {
             segments[key] = value[0];
           }
@@ -273,39 +273,24 @@ export default defineNuxtComponent({
       return {segments, parameters} ;
     },
 
-
-
     updateRoute(segments, parameters) {
-
       let pathSegments = [];
 
       if (segments.categories) {
-        pathSegments
-            .push(`${segments.categories}`);
+        pathSegments.push(`${segments.categories}`);
       }
+
       if (segments.collections) {
-        pathSegments
-            .push(`${segments.collections}`);
+        pathSegments.push(`${segments.collections}`);
       }
-      let path = pathSegments.length > 0 ? `/catalog/${pathSegments
-          .join('/')}/` : '/catalog/';
 
-      this.$router
-          .push({ path, query: parameters });
+      pathSegments = [...new Set(pathSegments)];
+
+      const path = pathSegments.length > 0 ? `/catalog/${pathSegments.join('/')}/` : '/catalog/';
+
+      this.$router.push({ path, query: parameters });
     },
   },
-
-  watch: {
-    selectedItems: {
-      handler(newSelectedItems, oldSelectedItems) {
-        const { pathSegments, queryParams } = this.createFilterParams();
-        const { segments, parameters } = this.processFilterParams(pathSegments, queryParams);
-        this.updateRoute(segments, parameters);
-      },
-      deep: true,
-    },
-  },
-
 });
 </script>
 
@@ -313,7 +298,7 @@ export default defineNuxtComponent({
 ul{
   list-style: none;
 }
-.categories__sub-categories {
+.categories__subcategories {
   margin-left: 1rem;
 }
 </style>

@@ -9,7 +9,7 @@
       >
         <div
             v-for="product in productlist"
-            :key="product.name"
+            :key="product.id"
             class="products__single-product"
         >
           <h2>{{ product.name }}</h2>

@@ -4,6 +4,10 @@ export default defineNuxtConfig({
 
   devtools: { enabled: true },
 
+  plugins: [
+    '~/plugins/filterProducts.js',
+  ],
+
   components: [
     {
       path: "~/components",
