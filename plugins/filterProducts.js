@@ -27,7 +27,7 @@ export default defineNuxtPlugin(() => {
                 const categoryFilter = categoryMap[category];
                 const collectionFilter = collectionMap[collection];
 
-                if (!this.$route.params.category && !this.$route.params.collection) {
+                if (!categoryFilter && !collectionFilter) {
                     return products
                         .filter((product) =>
                             Object
